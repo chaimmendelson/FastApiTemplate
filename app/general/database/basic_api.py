@@ -54,6 +54,9 @@ class BaseAPI:
     async def put(self, endpoint: str, **kwargs) -> httpx.Response:
         return await self.request("PUT", endpoint, **kwargs)
 
+    async def patch(self, endpoint: str, **kwargs) -> httpx.Response:
+        return await self.request("PATCH", endpoint, **kwargs)
+
     async def delete(self, endpoint: str, **kwargs) -> httpx.Response:
         return await self.request("DELETE", endpoint, **kwargs)
 
