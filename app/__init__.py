@@ -17,6 +17,7 @@ def create_app() -> FastAPI:
     app = FastAPI(docs_url=None, redoc_url=None)
     static_path = Path(__file__).parent / "static"
     app.mount("/static", StaticFiles(directory=static_path), name="static")
+    app.openapi_url = "/openapi.json"
 
     @app.get("/docs", include_in_schema=False)
     async def custom_swagger_ui_html():
@@ -25,7 +26,7 @@ def create_app() -> FastAPI:
             swagger_js_url="/static/swagger-ui-bundle.js",
             swagger_css_url="/static/swagger-ui.css",
             swagger_favicon_url="/static/favicon.ico",
-            openapi_url="/static/openapi.json",
+            openapi_url=app.openapi_url
         )
 
     @app.get("/redoc", include_in_schema=False)
@@ -34,8 +35,15 @@ def create_app() -> FastAPI:
             title="ReDoc",
             redoc_js_url="/static/redoc.standalone.js",
             redoc_favicon_url="/static/favicon.ico",
-            openapi_url="/static/openapi.json",
+            openapi_url=app.openapi_url
         )
+
+    @app.get(app.openapi_url, include_in_schema=False)
+    async def get_openapi():
+        """
+        Endpoint to serve the OpenAPI schema.
+        """
+        return app.openapi()
 
     @app.middleware("http")
     async def log_requests(request: Request, call_next):
@@ -55,8 +63,4 @@ def create_app() -> FastAPI:
         """
         return {"message": "Hello, World!"}
 
-    app.openapi()
-
-    with open(Path(__file__).parent / "static" / "openapi.json", "w") as f:
-        f.write(json.dumps(app.openapi(), indent=2))
     return app
