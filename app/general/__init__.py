@@ -1,19 +1,17 @@
-import time
+from pathlib import Path
+from fastapi import FastAPI
+from starlette.staticfiles import StaticFiles
 
 from .utils import logger_config, config
 from .database import basic_api
-from .routes import routers, handlers
-
-from pathlib import Path
-
-from fastapi import FastAPI, Request
-from starlette.staticfiles import StaticFiles
-from loguru import logger
+from .routes import add_routers
+from .middlewares import add_middlewares
 
 
 def general_create_app(
     *,
     enable_logging_middleware: bool = True,
+    enable_time_recording_middleware: bool = True,
     enable_root_route: bool = True,
     enable_exception_handlers: bool = True,
     **fastapi_kwargs
@@ -23,6 +21,7 @@ def general_create_app(
 
     Args:
         enable_logging_middleware: If True, add basic logging middleware.
+        enable_time_recording_middleware: If True, add request time recording middleware.
         enable_root_route: If True, add the root '/' route.
         enable_exception_handlers: If True, add exception handlers.
         **fastapi_kwargs: Additional keyword arguments for FastAPI().
@@ -37,12 +36,14 @@ def general_create_app(
     static_files_path = Path(__file__).parent.parent / "static"
     app.mount("/static", StaticFiles(directory=static_files_path), name="static")
 
-    for router in routers:
-        app.include_router(router)
+    add_routers(app)
 
-    if enable_exception_handlers:
-        for handler in handlers:
-            app.add_exception_handler(handler.exception_class, handler.handler)
+    add_middlewares(
+        app,
+        enable_request_logging=enable_logging_middleware,
+        enable_request_timing=enable_time_recording_middleware,
+        enable_exception_handlers=enable_exception_handlers,
+    )
 
     @app.get(config.SWAGGER_OPENAPI_JSON_URL, include_in_schema=False)
     async def get_openapi():
@@ -50,25 +51,6 @@ def general_create_app(
         Endpoint to serve the OpenAPI schema.
         """
         return app.openapi()
-
-    if enable_logging_middleware:
-        @app.middleware("http")
-        async def log_requests(request: Request, call_next):
-            """
-            Middleware to log incoming requests.
-            """
-            logger.info(f"[Request] {request.method} {request.url.path}")
-
-            start_time = time.perf_counter_ns()
-
-            response = await call_next(request)
-
-            process_time = time.perf_counter_ns() - start_time
-            response.headers["X-Process-Time"] = str(process_time)
-
-            logger.info(f"[Response] {request.method} {request.url.path} {response.status_code} {process_time}")
-
-            return response
 
     if enable_root_route:
         @app.get("/", response_model=dict, status_code=200)

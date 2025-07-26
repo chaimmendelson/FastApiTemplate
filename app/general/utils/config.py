@@ -22,6 +22,12 @@ class Settings(BaseSettings):
         examples=["UserService", "PaymentAPI"],
     )
 
+    PROCESS_TIME_HEADER: str = Field(
+        default="X-Process-Time",
+        description="Header name to include process time in responses.",
+        examples=["X-Process-Time", "X-Response-Time"],
+    )
+
     SWAGGER_STATIC_FILES: str = Field(
         default="/static/swagger",
         description="URL path to serve Swagger UI static files.",
@@ -32,5 +38,11 @@ class Settings(BaseSettings):
         default="/openapi.json",
         description="Endpoint URL for OpenAPI JSON schema.",
         examples=["/openapi.json"],
+    )
+
+    LOG_REQUEST_EXCLUDE_PATHS: list[str] = Field(
+        default=["/health", "/metrics", "/static", "/docs", "/redoc", "/openapi.json", "/.well-known"],
+        description="List of paths to ignore for logging.",
+        examples=[["/health", "/metrics"]],
     )
 

@@ -9,3 +9,4 @@ python-multipart
 colorama
 loguru
 python-dotenv
+prometheus-client

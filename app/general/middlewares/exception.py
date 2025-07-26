@@ -2,7 +2,7 @@ from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
-from ..models import ExceptionHandlerConfig
+from app.general.models import ExceptionHandlerConfig
 
 async def http_exception_handler(
         request: Request,
