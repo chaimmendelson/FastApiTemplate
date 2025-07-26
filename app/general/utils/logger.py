@@ -84,8 +84,3 @@ class Logger:
         setup_loguru(logLevel)
         self.dict_config = get_logging_dict(logLevel)
         logging.config.dictConfig(self.dict_config)
-
-
-
-def get_logger():
-    return logger
