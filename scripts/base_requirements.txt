@@ -1,0 +1,11 @@
+fastapi
+pydantic
+pydantic-settings
+uvicorn
+uvloop
+httptools
+httpx
+python-multipart
+colorama
+loguru
+python-dotenv
