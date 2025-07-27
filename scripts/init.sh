@@ -35,7 +35,7 @@ echo "✅ uv version: $(uv --version)"
 # Install base requirements first if present
 if [ -f "$BASE_REQUIREMENTS_FILE" ]; then
   echo "📚 Installing base dependencies from $BASE_REQUIREMENTS_FILE..."
-  uv pip install -r "$BASE_REQUIREMENTS_FILE"
+  uv pip install -r "$BASE_REQUIREMENTS_FILE" --native-tls
 else
   echo "⚠️ $BASE_REQUIREMENTS_FILE not found. Skipping base dependency installation."
 fi
@@ -43,7 +43,7 @@ fi
 # Then install main requirements
 echo "📚 Installing dependencies from $REQUIREMENTS_FILE..."
 if [ -f "$REQUIREMENTS_FILE" ]; then
-  uv pip install -r "$REQUIREMENTS_FILE"
+  uv pip install -r "$REQUIREMENTS_FILE" --native-tls
 else
   echo "⚠️ $REQUIREMENTS_FILE not found. Skipping dependency installation."
 fi
