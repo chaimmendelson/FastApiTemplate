@@ -2,6 +2,11 @@
 
 A comprehensive FastAPI template with built-in logging, monitoring, middleware, and utility components for rapid API development.
 
+**⚠️ Important**:
+
+- **Fork this repository** before making any changes - do not edit this template directly
+- Only edit content in the `app/src` folder. The `app/general` folder contains the core framework and should not be modified
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -196,6 +201,11 @@ client = await get_dynamic_client(in_cluster=True)
 ```
 
 ## 🎯 Custom Development
+
+**⚠️ Important**:
+
+- **Fork this repository** before making any changes - do not edit this template directly
+- Only edit content in the `app/src` folder. The `app/general` folder contains the core framework and should not be modified
 
 ### Adding Routes
 
