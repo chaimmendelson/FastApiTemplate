@@ -5,7 +5,12 @@ from fastapi import Request, HTTPException
 from fastapi.exceptions import ValidationException, WebSocketException
 from fastapi.responses import JSONResponse
 
-exception_type = Union[Exception, HTTPException, ValidationException, WebSocketException]
+exception_type = Union[
+    Type[Exception],
+    Type[HTTPException],
+    Type[ValidationException],
+    Type[WebSocketException]
+]
 
 class ExceptionHandlerConfig(BaseModel):
     exception_class: exception_type
