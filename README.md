@@ -11,6 +11,8 @@ A comprehensive FastAPI template with built-in logging, monitoring, middleware, 
 
 ### Installation
 
+#### For Linux/macOS:
+
 1. **Clone the repository**
 
    ```bash
@@ -33,6 +35,32 @@ A comprehensive FastAPI template with built-in logging, monitoring, middleware, 
 
 4. **Run the application**
    ```bash
+   python -m app.main
+   ```
+
+#### For Windows:
+
+1. **Clone the repository**
+
+   ```cmd
+   git clone <repository-url>
+   cd FastApiTemplate
+   ```
+
+2. **Run the initialization script**
+
+   ```cmd
+   scripts\init.bat
+   ```
+
+3. **Activate the virtual environment**
+
+   ```cmd
+   .venv\Scripts\activate.bat
+   ```
+
+4. **Run the application**
+   ```cmd
    python -m app.main
    ```
 

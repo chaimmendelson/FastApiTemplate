@@ -3,7 +3,6 @@ fastapi
 pydantic
 pydantic-settings
 uvicorn
-uvloop
 httptools
 httpx
 python-multipart
