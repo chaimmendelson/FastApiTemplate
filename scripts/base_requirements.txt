@@ -1,3 +1,4 @@
+aioftp
 fastapi
 pydantic
 pydantic-settings
@@ -10,3 +11,4 @@ colorama
 loguru
 python-dotenv
 prometheus-client
+kubernetes_asyncio
