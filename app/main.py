@@ -10,5 +10,7 @@ if __name__ == "__main__":
         app,
         host="0.0.0.0",
         port=int(basicSettings.PORT),
-        log_config=logger_config.dict_config
+        log_config=logger_config.dict_config,
+        reload=bool(basicSettings.DEV_MODE),
+        reload_includes=basicSettings.RELOAD_INCLUDES,
     )

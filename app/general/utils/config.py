@@ -10,11 +10,39 @@ class BasicSettings(BaseSettings):
         examples=[8000, 8080],
     )
 
-    LOG_LEVEL: str = Field(
-        default="INFO",
-        description="Logging level for the application.",
-        examples=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+    DEV_MODE: bool = Field(
+        default=False,
+        description="Enable development mode for the application.",
+        examples=[True, False],
     )
+
+    if DEV_MODE:
+
+        LOG_LEVEL: str = Field(
+            default="DEBUG",
+            description="Logging level for the application.",
+            examples=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        )
+
+        RELOAD_INCLUDES: list[str] = Field(
+            default=["*.py", ".env", "*.css", "*.js"],
+            description="File patterns to watch for changes in development mode.",
+            examples=[["*.py", "*.env"]],
+        )
+
+    else:
+
+        RELOAD_INCLUDES: list[str] = Field(
+            default=[],
+            description="File patterns to watch for changes in production mode.",
+            examples=[[]],
+        )
+
+        LOG_LEVEL: str = Field(
+            default="INFO",
+            description="Logging level for the application.",
+            examples=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        )
 
     APP_NAME: str = Field(
         default="MyApp",
@@ -45,4 +73,3 @@ class BasicSettings(BaseSettings):
         description="List of paths to ignore for logging.",
         examples=[["/health", "/metrics"]],
     )
-
