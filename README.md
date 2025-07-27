@@ -61,7 +61,7 @@ A comprehensive FastAPI template with built-in logging, monitoring, middleware, 
 3. **Activate the virtual environment**
 
    ```cmd
-   .venv\Scripts\activate.bat
+   .venv\Scripts\activate
    ```
 
 4. **Run the application**

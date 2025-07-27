@@ -13,12 +13,7 @@ class BaseAPI:
         self.base_url = base_url.rstrip("/")
         self.headers = headers or {}
         self.timeout = timeout
-        self.client = httpx.AsyncClient(
-            base_url=self.base_url,
-            headers=self.headers,
-            timeout=self.timeout,
-            verify=verify,
-        )
+        self.verify = verify
 
     async def request(
         self,
@@ -34,16 +29,22 @@ class BaseAPI:
         merged_headers = {**self.headers, **(headers or {})}
 
         try:
-            response = await self.client.request(
-                method=method.upper(),
-                url=url,
-                params=params,
-                data=data,
-                json=json,
-                headers=merged_headers,
-                files=files,
-            )
-            return response  # Always return response, caller decides what to do with status code
+            async with httpx.AsyncClient(
+                base_url=self.base_url,
+                headers=self.headers,
+                timeout=self.timeout,
+                verify=self.verify,
+            ) as client:
+                response = await client.request(
+                    method=method.upper(),
+                    url=url,
+                    params=params,
+                    data=data,
+                    json=json,
+                    headers=merged_headers,
+                    files=files,
+                )
+                return response  # Always return response, caller decides what to do with status code
         except httpx.RequestError as e:
             raise RuntimeError(f"Request failed: {str(e)}") from e
 

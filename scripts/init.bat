@@ -33,7 +33,7 @@ IF NOT EXIST "%VENV_DIR%" (
 )
 
 REM 🔁 Activate virtual environment
-CALL "%VENV_DIR%\Scripts\activate.bat"
+CALL "%VENV_DIR%\Scripts\activate"
 
 REM 📥 Install uv package
 echo 📥 Installing 'uv' package in virtual environment...
@@ -60,6 +60,6 @@ IF EXIST "%REQUIREMENTS_FILE%" (
 )
 
 echo ✅ Setup complete. To activate your environment later:
-echo     CALL "%VENV_DIR%\Scripts\activate.bat"
+echo     CALL "%VENV_DIR%\Scripts\activate"
 
 endlocal
