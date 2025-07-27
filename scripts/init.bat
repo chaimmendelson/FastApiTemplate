@@ -35,18 +35,15 @@ IF NOT EXIST "%VENV_DIR%" (
 REM 🔁 Activate virtual environment
 CALL "%VENV_DIR%\Scripts\activate"
 
-REM 📥 Install uv package
-echo 📥 Installing 'uv' package in virtual environment...
+REM 🔄 Upgrade pip
+echo 🔄 Upgrading pip...
 python.exe -m pip install --upgrade pip
-python.exe -m pip install uv
 
-FOR /F "tokens=*" %%i IN ('uv --version') DO SET UV_VERSION=%%i
-echo ✅ uv version: %UV_VERSION%
 
 REM 📚 Install base requirements if present
 IF EXIST "%BASE_REQUIREMENTS_FILE%" (
     echo 📚 Installing base dependencies from %BASE_REQUIREMENTS_FILE%...
-    uv pip install -r "%BASE_REQUIREMENTS_FILE%" --native-tls
+    pip install -r "%BASE_REQUIREMENTS_FILE%"
 ) ELSE (
     echo ⚠️ %BASE_REQUIREMENTS_FILE% not found. Skipping base dependency installation.
 )
@@ -54,7 +51,7 @@ IF EXIST "%BASE_REQUIREMENTS_FILE%" (
 REM 📚 Install main requirements
 IF EXIST "%REQUIREMENTS_FILE%" (
     echo 📚 Installing dependencies from %REQUIREMENTS_FILE%...
-    uv pip install -r "%REQUIREMENTS_FILE%" --native-tls
+    pip install -r "%REQUIREMENTS_FILE%"
 ) ELSE (
     echo ⚠️ %REQUIREMENTS_FILE% not found. Skipping dependency installation.
 )
