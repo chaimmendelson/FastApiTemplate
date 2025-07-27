@@ -2,7 +2,7 @@ from fastapi import Request
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from ..utils import config
+from ..utils import basicSettings
 
 
 class LogRequestsMiddleware(BaseHTTPMiddleware):
@@ -12,7 +12,7 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
         """
         log_level = "INFO"
 
-        if any(request.url.path.startswith(prefix) for prefix in config.LOG_REQUEST_EXCLUDE_PATHS):
+        if any(request.url.path.startswith(prefix) for prefix in basicSettings.LOG_REQUEST_EXCLUDE_PATHS):
             log_level = "DEBUG"
 
         logger.log(
@@ -22,7 +22,7 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
 
-        process_time = response.headers.get(config.PROCESS_TIME_HEADER) or ""
+        process_time = response.headers.get(basicSettings.PROCESS_TIME_HEADER) or ""
 
         logger.log(
             log_level,

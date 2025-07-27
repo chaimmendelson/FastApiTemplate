@@ -1,10 +1,10 @@
 from pydantic import ValidationError
 
 from app.general.utils.logger import Logger
-from app.general.utils.config import Settings
+from app.general.utils.config import BasicSettings
 
 try:
-    config = Settings()
+    basicSettings = BasicSettings()
 except ValidationError as e:
     print(
         f"Configuration error: {e}\n"
@@ -12,4 +12,4 @@ except ValidationError as e:
     )
     exit(1)
 
-logger_config = Logger(config.LOG_LEVEL)
+logger_config = Logger(basicSettings.LOG_LEVEL)

@@ -2,7 +2,7 @@ import time
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from ..utils import config
+from ..utils import basicSettings
 
 class TimeRequestsMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -15,6 +15,6 @@ class TimeRequestsMiddleware(BaseHTTPMiddleware):
 
         process_time = time.perf_counter_ns() - start_time
 
-        response.headers[config.PROCESS_TIME_HEADER] = str(process_time)
+        response.headers[basicSettings.PROCESS_TIME_HEADER] = str(process_time)
 
         return response

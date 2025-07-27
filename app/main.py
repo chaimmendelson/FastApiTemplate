@@ -1,5 +1,5 @@
 from . import create_app
-from app.general import config, logger_config
+from app.general import basicSettings, logger_config
 
 app = create_app()
 
@@ -9,6 +9,6 @@ if __name__ == "__main__":
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=int(config.PORT),
+        port=int(basicSettings.PORT),
         log_config=logger_config.dict_config
     )

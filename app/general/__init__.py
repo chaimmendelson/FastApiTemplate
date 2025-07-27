@@ -5,7 +5,7 @@ from typing import Coroutine
 from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 
-from .utils import logger_config, config
+from .utils import logger_config, basicSettings
 from .database import basic_api
 from .routes import add_routers
 from .middlewares import add_middlewares
@@ -51,7 +51,7 @@ def general_create_app(
         **fastapi_kwargs,
         docs_url=None,
         redoc_url=None,
-        openapi_url=config.SWAGGER_OPENAPI_JSON_URL,
+        openapi_url=basicSettings.SWAGGER_OPENAPI_JSON_URL,
         lifespan=lifespan,
     )
 
@@ -67,7 +67,7 @@ def general_create_app(
         enable_exception_handlers=enable_exception_handlers,
     )
 
-    @app.get(config.SWAGGER_OPENAPI_JSON_URL, include_in_schema=False)
+    @app.get(basicSettings.SWAGGER_OPENAPI_JSON_URL, include_in_schema=False)
     async def get_openapi():
         """
         Endpoint to serve the OpenAPI schema.
@@ -80,6 +80,6 @@ def general_create_app(
             """
             Root endpoint that returns a simple message.
             """
-            return {"message": f"Welcome to the {config.APP_NAME}!"}
+            return {"message": f"Welcome to the {basicSettings.APP_NAME}!"}
 
     return app
