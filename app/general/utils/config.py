@@ -16,7 +16,7 @@ class BasicSettings(BaseSettings):
         examples=[True, False],
     )
 
-    if DEV_MODE:
+    if DEV_MODE == True:
 
         LOG_LEVEL: str = Field(
             default="DEBUG",
