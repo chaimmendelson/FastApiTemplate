@@ -8,6 +8,7 @@ class BaseAPI:
         base_url: str,
         headers: Optional[Dict[str, str]] = None,
         timeout: Optional[float] = 10.0,
+        verify: bool = False,
     ):
         self.base_url = base_url.rstrip("/")
         self.headers = headers or {}
@@ -15,7 +16,8 @@ class BaseAPI:
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
             headers=self.headers,
-            timeout=self.timeout
+            timeout=self.timeout,
+            verify=verify,
         )
 
     async def request(
