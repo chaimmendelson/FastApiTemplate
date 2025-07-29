@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Coroutine
+from typing import Coroutine, Callable, Any, AsyncGenerator
 from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 
@@ -13,7 +13,7 @@ from .tasks import get_tasks
 
 def general_create_app(
     *,
-    async_background_tasks: list[Coroutine] = None,
+    async_background_tasks: list[Callable[[], Coroutine]] = None,
     enable_logging_middleware: bool = True,
     enable_time_recording_middleware: bool = True,
     enable_root_route: bool = True,
@@ -42,23 +42,33 @@ def general_create_app(
     ))
 
     @asynccontextmanager
-    async def lifespan(app: FastAPI):
-        for task in async_background_tasks:
-            asyncio.create_task(task)
-        yield
+    async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
+        tasks: list[asyncio.Task] = []
+
+        for coro_fn in async_background_tasks:
+            task = asyncio.create_task(coro_fn())
+            tasks.append(task)
+
+        try:
+            yield  # Startup complete; application runs now
+        finally:
+            for task in tasks:
+                task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
 
     app = FastAPI(
         **fastapi_kwargs,
         docs_url=None,
         redoc_url=None,
-        openapi_url=basicSettings.SWAGGER_OPENAPI_JSON_URL,
+        openapi_url=basicSettings.OPENAPI_JSON_URL,
         lifespan=lifespan,
+        root_path=basicSettings.PROXY_LISTEN_PATH,
     )
 
     static_files_path = Path(__file__).parent.parent / "static"
     app.mount("/static", StaticFiles(directory=static_files_path), name="static")
 
-    app.openapi_version = basicSettings.SWAGGER_OPENAPI_VERSION
+    app.openapi_version = basicSettings.OPENAPI_VERSION
 
     add_routers(app)
 

@@ -40,23 +40,37 @@ class BasicSettings(BaseSettings):
         examples=["X-Process-Time", "X-Response-Time"],
     )
 
+    OPENAPI_VERSION: str = Field(
+        default="3.0.2",
+        description="OpenAPI version used for the Swagger UI.",
+        examples=["3.0.2", "3.1.0"],
+    )
+
+    OPENAPI_JSON_URL: str = Field(
+        default="/openapi.json",
+        description="Path to the OpenAPI JSON schema.",
+        examples=["/openapi.json", "/api/openapi.json"],
+    )
+
+    PROXIED: bool = Field(
+        default=False,
+        description="Whether the Api is behind a proxy.",
+        examples=[True, False],
+    )
+
+    PROXY_LISTEN_PATH: str = Field(
+        default="/",
+        description="Path where the proxy listens for requests.",
+        examples=["/proxy", "/api/proxy"],
+    )
+
     SWAGGER_STATIC_FILES: str = Field(
         default="/static/swagger",
         description="URL path to serve Swagger UI static files.",
         examples=["/static/swagger"],
     )
 
-    SWAGGER_OPENAPI_VERSION: str = Field(
-        default="3.0.2",
-        description="OpenAPI version used for the Swagger UI.",
-        examples=["3.0.2", "3.1.0"],
-    )
-
-    SWAGGER_OPENAPI_JSON_URL: str = Field(
-        default="/openapi.json",
-        description="Endpoint URL for OpenAPI JSON schema.",
-        examples=["/openapi.json"],
-    )
+    SWAGGER_OPENAPI_JSON_URL: str = OPENAPI_JSON_URL
 
     LOG_REQUEST_EXCLUDE_PATHS: list[str] = Field(
         default=["/health", "/metrics", "/static", "/docs", "/redoc", "/openapi.json", "/.well-known"],
