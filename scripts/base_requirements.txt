@@ -10,3 +10,4 @@ loguru
 python-dotenv
 prometheus-client
 kubernetes_asyncio
+watchfiles

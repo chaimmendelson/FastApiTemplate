@@ -58,6 +58,8 @@ def general_create_app(
     static_files_path = Path(__file__).parent.parent / "static"
     app.mount("/static", StaticFiles(directory=static_files_path), name="static")
 
+    app.openapi_version = basicSettings.SWAGGER_OPENAPI_VERSION
+
     add_routers(app)
 
     add_middlewares(
