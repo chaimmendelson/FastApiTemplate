@@ -15,10 +15,11 @@ def update_basic_settings(settings: BasicSettings):
                 settings.PROXY_LISTEN_PATH + "/" +
                 settings.OPENAPI_JSON_URL.lstrip("/")
         )
-        for path in settings.LOG_REQUEST_EXCLUDE_PATHS:
-            settings.LOG_REQUEST_EXCLUDE_PATHS.append(
-                settings.PROXY_LISTEN_PATH + "/" + path
-            )
+        
+        settings.LOG_REQUEST_EXCLUDE_PATHS.extend([
+            settings.PROXY_LISTEN_PATH + "/" + path.lstrip("/") 
+            for path in settings.LOG_REQUEST_EXCLUDE_PATHS
+        ])
 
     else:
         settings.PROXY_LISTEN_PATH = ""
