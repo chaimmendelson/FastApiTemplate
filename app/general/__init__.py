@@ -19,6 +19,9 @@ def general_create_app(
     enable_root_route: bool = True,
     enable_exception_handlers: bool = True,
     enable_uptime_background_task: bool = True,
+    enable_metrics_route: bool = True,
+    enable_swagger_routes: bool = True,
+    enable_probe_routes: bool = True,
     **fastapi_kwargs
 ) -> FastAPI:
     """
@@ -31,6 +34,9 @@ def general_create_app(
         enable_root_route: If True, add the root '/' route.
         enable_exception_handlers: If True, add exception handlers.
         enable_uptime_background_task: If true, add uptime background task.
+        enable_metrics_route: If True, add metrics route.
+        enable_swagger_routes: If True, add Swagger UI routes.
+        enable_probe_routes: If True, add health check routes.
         **fastapi_kwargs: Additional keyword arguments for FastAPI().
     """
 
@@ -76,7 +82,12 @@ def general_create_app(
 
     app.openapi_version = basicSettings.OPENAPI_VERSION
 
-    add_routers(app)
+    add_routers(
+        app,
+        enable_metrics=enable_metrics_route,
+        enable_swagger=enable_swagger_routes,
+        enable_probe=enable_probe_routes,
+    )
 
     add_middlewares(
         app,

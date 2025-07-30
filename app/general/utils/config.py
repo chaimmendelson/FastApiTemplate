@@ -78,3 +78,15 @@ class BasicSettings(BaseSettings):
         examples=[["/health", "/metrics"]],
     )
 
+    PROBE_READINESS_PATH : str = Field(
+        default="/readiness",
+        description="Path for readiness probe.",
+        examples=["/readiness", "/api/readiness"],
+    )
+
+    PROBE_LIVENESS_PATH : str = Field(
+        default="/liveness",
+        description="Path for liveness probe.",
+        examples=["/liveness", "/api/liveness"],
+    )
+
