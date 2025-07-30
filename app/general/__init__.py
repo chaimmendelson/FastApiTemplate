@@ -2,7 +2,8 @@ import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Coroutine, Callable, Any, AsyncGenerator
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
 from .utils import logger_config, basicSettings
@@ -66,7 +67,13 @@ def general_create_app(
     )
 
     static_files_path = Path(__file__).parent.parent / "static"
-    app.mount("/static", StaticFiles(directory=static_files_path), name="static")
+
+    @app.get("/static/{full_path:path}")
+    async def serve_file(full_path: str):
+        file_path = static_files_path / full_path
+        if not file_path.exists() or not file_path.is_file():
+            raise HTTPException(status_code=404, detail="File not found")
+        return FileResponse(file_path)
 
     app.openapi_version = basicSettings.OPENAPI_VERSION
 
