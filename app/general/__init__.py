@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Coroutine, Callable, Any, AsyncGenerator
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
-from starlette.staticfiles import StaticFiles
 
 from .utils import logger_config, basicSettings
 from .database import basic_api
@@ -99,6 +98,6 @@ def general_create_app(
             """
             Root endpoint that returns a simple message.
             """
-            return {"message": f"Welcome to the {basicSettings.APP_NAME}!"}
+            return {"message": f"Welcome to {basicSettings.APP_NAME}!"}
 
     return app
