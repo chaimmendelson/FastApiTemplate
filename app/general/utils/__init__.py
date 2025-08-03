@@ -1,7 +1,8 @@
 from pydantic import ValidationError
 
-from app.general.utils.logger import Logger
-from app.general.utils.config import BasicSettings
+from .logger import Logger
+from .config import BasicSettings
+from loguru import logger
 
 
 def update_basic_settings(settings: BasicSettings):
@@ -29,7 +30,7 @@ try:
     basicSettings = BasicSettings()
     update_basic_settings(basicSettings)
 except ValidationError as e:
-    print(
+    logger.error(
         f"Configuration error: {e}\n"
         "Please ensure that all required environment variables are set correctly."
     )

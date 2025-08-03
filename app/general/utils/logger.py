@@ -1,73 +1,54 @@
 from loguru import logger
-from colorama import init as colorama_init, Fore, Style
 import sys
 import logging
 import logging.config
 
-colorama_init(autoreset=True)
+class UvicornHandler(logging.Handler):
+    def emit(self, record):
+        logger.log(
+            record.levelname, record.getMessage(),
+            extra={
+               "location": "Uvicorn",
+            }
+        )
 
-LOG_COLORS = {
-    "TRACE": Fore.BLUE,
-    "DEBUG": Fore.CYAN,
-    "INFO": Fore.GREEN,
-    "SUCCESS": Fore.GREEN,
-    "WARNING": Fore.YELLOW,
-    "ERROR": Fore.RED,
-    "CRITICAL": Fore.MAGENTA,
-}
+def base_formatter(record):
+    extra = record.get("extra", {}).get("extra", {})
 
+    location = extra.get("location", "{name}:{function}:{line}")
 
-def formatter(record):
-    level = record["level"].name
-    color = LOG_COLORS.get(level, "")
-    time = record["time"].strftime("%Y-%m-%d %H:%M:%S")
-    filename = str(record["file"].name).rstrip(".py")
-    func = record["function"]
-    line = record["line"]
-    message = record["message"]
-    return f"{color}{time} - {level} - {filename} - {func}:{line} - {message}{Style.RESET_ALL}\n"
-
+    return (
+        "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+        "<level>{level:<8}</level> | "
+        f"<cyan>{location}</cyan> - "
+        "<level>{message}</level>\n"
+    )
 
 def setup_loguru(logLevel: str = "INFO"):
     logger.remove()
     logger.add(
         sys.stdout,
         level=logLevel,
-        format=formatter,
+        format=base_formatter,
         backtrace=False,
         diagnose=False,
     )
-
-
-class ColoredFormatter(logging.Formatter):
-    def format(self, record):
-        color = LOG_COLORS.get(record.levelname, "")
-        message = super().format(record)
-        return f"{color}{message}{Style.RESET_ALL}"
 
 
 def get_logging_dict(logLevel: str = "INFO"):
     return {
         'version': 1,
         'disable_existing_loggers': False,
-        'formatters': {
-            'colored': {
-                '()': ColoredFormatter,
-                'fmt': '%(asctime)s - %(levelname)s - %(message)s',
-                'datefmt': '%Y-%m-%d %H:%M:%S',
-            }
-        },
         'handlers': {
-            'console': {
+            'UvicornHandler': {
                 'level': logLevel.upper(),
-                'class': 'logging.StreamHandler',
-                'formatter': 'colored',
+                'class': UvicornHandler,
             }
         },
         'loggers': {
             'uvicorn': {
                 'level': logLevel.upper(),
-                'handlers': ['console'],
+                'handlers': ['UvicornHandler'],
                 'propagate': False,
             },
             'uvicorn.access': {
