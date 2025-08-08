@@ -24,35 +24,35 @@ def base_formatter(record):
         "<level>{message}</level>\n"
     )
 
-def setup_loguru(logLevel: str = "INFO"):
+def setup_loguru(log_level: str = "INFO"):
     logger.remove()
     logger.add(
         sys.stdout,
-        level=logLevel,
+        level=log_level,
         format=base_formatter,
         backtrace=False,
         diagnose=False,
     )
 
 
-def get_logging_dict(logLevel: str = "INFO"):
+def get_logging_dict(log_level: str = "INFO"):
     return {
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
             'UvicornHandler': {
-                'level': logLevel.upper(),
+                'level': log_level.upper(),
                 'class': UvicornHandler,
             }
         },
         'loggers': {
             'uvicorn': {
-                'level': logLevel.upper(),
+                'level': log_level.upper(),
                 'handlers': ['UvicornHandler'],
                 'propagate': False,
             },
             'uvicorn.access': {
-                'level': logLevel.upper(),
+                'level': log_level.upper(),
                 'handlers': [],
                 'propagate': False,
             },
@@ -61,7 +61,7 @@ def get_logging_dict(logLevel: str = "INFO"):
 
 class Logger:
 
-    def __init__(self, logLevel: str = "INFO"):
-        setup_loguru(logLevel)
-        self.dict_config = get_logging_dict(logLevel)
+    def __init__(self, log_level: str = "INFO"):
+        setup_loguru(log_level)
+        self.dict_config = get_logging_dict(log_level)
         logging.config.dictConfig(self.dict_config)
