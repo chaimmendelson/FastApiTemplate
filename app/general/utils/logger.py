@@ -42,7 +42,7 @@ def get_logging_dict(log_level: str = "INFO"):
         'handlers': {
             'UvicornHandler': {
                 'level': log_level.upper(),
-                'class': UvicornHandler,
+                '()': UvicornHandler,
             }
         },
         'loggers': {
