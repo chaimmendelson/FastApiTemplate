@@ -29,6 +29,7 @@ A comprehensive FastAPI template with built-in logging, monitoring, middleware, 
 
    ```bash
    chmod +x scripts/init.sh
+   dos2unix scripts/init.sh
    ./scripts/init.sh
    ```
 
