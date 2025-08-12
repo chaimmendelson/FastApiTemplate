@@ -6,11 +6,22 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=int(basicSettings.PORT),
-        log_config=logger_config.dict_config,
-        reload=basicSettings.DEBUG,
-        reload_includes=basicSettings.RELOAD_INCLUDES,
-    )
+    if basicSettings.DEBUG:
+        
+        uvicorn.run(
+            "app.main:app",
+            host="0.0.0.0",
+            port=int(basicSettings.PORT),
+            log_config=logger_config.dict_config,
+            reload=True,
+            reload_includes=basicSettings.RELOAD_INCLUDES,
+        )
+
+    else:
+
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=int(basicSettings.PORT),
+            log_config=logger_config.dict_config,
+        )
