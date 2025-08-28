@@ -8,10 +8,10 @@ def create_app() -> FastAPI:
     Create and configure the FastAPI application.
     """
 
-    app, lifespan = general_create_app(
+    app = general_create_app(
         async_background_tasks=async_background_tasks
     )
 
-    update_app(app, lifespan)
+    update_app(app)
 
     return app
