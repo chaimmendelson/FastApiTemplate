@@ -1,7 +1,12 @@
+"""Settings definition for the FastAPI Tash application factory."""
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-class BasicSettings(BaseSettings):
+__all__ = ["ApplicationSettings"]
+
+
+class ApplicationSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     PORT: int = Field(
@@ -22,7 +27,7 @@ class BasicSettings(BaseSettings):
         examples=[True, False],
     )
 
-    RELOAD_INCLUDES: list = Field(
+    RELOAD_INCLUDES: list[str] = Field(
         default=[".env"],
         description="List of paths to files that triggers reloading.",
         examples=[["*.py"]]
@@ -78,13 +83,13 @@ class BasicSettings(BaseSettings):
         examples=[["/health", "/metrics"]],
     )
 
-    PROBE_READINESS_PATH : str = Field(
+    PROBE_READINESS_PATH: str = Field(
         default="/readiness",
         description="Path for readiness probe.",
         examples=["/readiness", "/api/readiness"],
     )
 
-    PROBE_LIVENESS_PATH : str = Field(
+    PROBE_LIVENESS_PATH: str = Field(
         default="/liveness",
         description="Path for liveness probe.",
         examples=["/liveness", "/api/liveness"],

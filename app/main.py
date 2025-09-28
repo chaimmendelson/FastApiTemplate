@@ -1,27 +1,27 @@
-from app import create_app
-from app.general import basicSettings, logger_config
+from fastapi_tash import create_app
 
 app = create_app()
+settings = app.state.settings
+logger_config = app.state.logger_config
+
 
 if __name__ == "__main__":
     import uvicorn
 
-    if basicSettings.DEBUG:
-        
+    if settings.DEBUG:
         uvicorn.run(
             "app.main:app",
             host="0.0.0.0",
-            port=int(basicSettings.PORT),
+            port=int(settings.PORT),
             log_config=logger_config.dict_config,
             reload=True,
-            reload_includes=basicSettings.RELOAD_INCLUDES,
+            reload_includes=settings.RELOAD_INCLUDES,
         )
 
     else:
-
         uvicorn.run(
             app,
             host="0.0.0.0",
-            port=int(basicSettings.PORT),
+            port=int(settings.PORT),
             log_config=logger_config.dict_config,
         )

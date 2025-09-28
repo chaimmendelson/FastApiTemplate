@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastapi-tash"
+version = "0.1.0"
+description = "A reusable FastAPI application factory"
+readme = "README.md"
+authors = [{ name = "FastAPI Template Maintainers" }]
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = [
+    "aioftp>=0.21",
+    "fastapi>=0.110",
+    "httpx>=0.24",
+    "kubernetes-asyncio>=29.0",
+    "loguru>=0.7",
+    "prometheus-client>=0.17",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+]
+
+[project.urls]
+Homepage = "https://example.com/fastapi-template"
+
+[tool.setuptools]
+package-dir = {"" = "package"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["package"]
+
+[tool.setuptools.package-data]
+fastapi_tash = ["static/**/*"]
