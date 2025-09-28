@@ -7,7 +7,7 @@ name = "fastapi-tash"
 version = "0.1.0"
 description = "A reusable FastAPI application factory"
 readme = "README.md"
-authors = [{ name = "FastAPI Template Maintainers" }]
+authors = [{ name = "Yehonatan Magen and Alon Elimelech" }]
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
 dependencies = [
