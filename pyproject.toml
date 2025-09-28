@@ -3,11 +3,11 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fastapi-template"
+name = "fastapi-tash"
 version = "0.1.0"
 description = "A reusable FastAPI application factory"
 readme = "README.md"
-authors = [{ name = "FastAPI Template Maintainers" }]
+authors = [{ name = "Yehonatan Magen and Alon Elimelech" }]
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
 dependencies = [
@@ -25,11 +25,11 @@ dependencies = [
 Homepage = "https://example.com/fastapi-template"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = {"" = "package"}
 include-package-data = true
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["package"]
 
 [tool.setuptools.package-data]
-fastapi_template = ["static/**/*"]
+fastapi_tash = ["static/**/*"]

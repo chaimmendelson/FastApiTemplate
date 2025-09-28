@@ -1,4 +1,4 @@
-# FastAPI Template
+# FastAPI Tash
 
 A reusable FastAPI application factory packaged for quick reuse. The package exposes a
 single public function, `create_app`, which returns a fully configured FastAPI
@@ -9,7 +9,7 @@ instance with logging, metrics, documentation, and health-check routes ready to 
 ### Installation
 
 ```bash
-pip install .
+pip install fastapi-tash
 ```
 
 ### Usage
@@ -17,7 +17,7 @@ pip install .
 Create a new file (for example `main.py`) and bootstrap your API:
 
 ```python
-from fastapi_template import create_app
+from fastapi_tash import create_app
 
 app = create_app()
 ```
@@ -45,7 +45,7 @@ LOG_REQUEST_EXCLUDE_PATHS=["/health", "/metrics", "/static", "/docs", "/redoc", 
 ```
 
 The same settings object is used internally to configure logging, documentation,
-and middleware. Although the implementation lives under `fastapi_template._internal`,
+and middleware. Although the implementation lives under `fastapi_tash._internal`,
 those modules are considered private and may change without notice.
 
 ## 🧩 Features
@@ -67,8 +67,8 @@ those modules are considered private and may change without notice.
 FastApiTemplate/
 ├── app/
 │   └── main.py               # Example application entrypoint
-├── src/
-│   └── fastapi_template/
+├── package/
+│   └── fastapi_tash/
 │       ├── __init__.py       # Public package exposing `create_app`
 │       ├── application.py    # Application factory implementation
 │       ├── _internal/        # Private framework modules

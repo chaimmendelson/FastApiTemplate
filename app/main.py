@@ -1,4 +1,4 @@
-from fastapi_template import create_app
+from fastapi_tash import create_app
 
 app = create_app()
 settings = app.state.settings
