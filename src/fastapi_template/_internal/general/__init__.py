@@ -1,19 +1,24 @@
+"""Core application wiring for the FastAPI template."""
+
 import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Coroutine, Callable, Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Callable, Coroutine
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
-from .utils import logger_config, basicSettings
-from .database import basic_api
-from .routes import add_routers
 from .middlewares import add_middlewares
+from .routes import add_routers
 from .tasks import get_tasks
+from .utils import basicSettings, logger_config
+
+__all__ = ["general_create_app", "basicSettings", "logger_config"]
+
 
 def general_create_app(
     *,
-    async_background_tasks: list[Callable[[], Coroutine]] = None,
+    async_background_tasks: list[Callable[[], Coroutine]] | None = None,
     enable_logging_middleware: bool = True,
     enable_time_recording_middleware: bool = True,
     enable_root_route: bool = True,
@@ -22,30 +27,16 @@ def general_create_app(
     enable_metrics_route: bool = True,
     enable_swagger_routes: bool = True,
     enable_probe_routes: bool = True,
-    **fastapi_kwargs
+    **fastapi_kwargs: Any,
 ) -> FastAPI:
-    """
-    Create and configure the FastAPI application.
-
-    Args:
-        async_background_tasks: A list of background tasks to execute.
-        enable_logging_middleware: If True, add basic logging middleware.
-        enable_time_recording_middleware: If True, add request time recording middleware.
-        enable_root_route: If True, add the root '/' route.
-        enable_exception_handlers: If True, add exception handlers.
-        enable_uptime_background_task: If true, add uptime background task.
-        enable_metrics_route: If True, add metrics route.
-        enable_swagger_routes: If True, add Swagger UI routes.
-        enable_probe_routes: If True, add health check routes.
-        **fastapi_kwargs: Additional keyword arguments for FastAPI().
-    """
+    """Create and configure the FastAPI application."""
 
     if async_background_tasks is None:
         async_background_tasks = []
 
-    async_background_tasks.extend(get_tasks(
-        enable_uptime_background_task=enable_uptime_background_task,
-    ))
+    async_background_tasks.extend(
+        get_tasks(enable_uptime_background_task=enable_uptime_background_task)
+    )
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
@@ -56,7 +47,7 @@ def general_create_app(
             tasks.append(task)
 
         try:
-            yield  # Startup complete; application runs now
+            yield
         finally:
             for task in tasks:
                 task.cancel()
@@ -71,7 +62,7 @@ def general_create_app(
         root_path=basicSettings.PROXY_LISTEN_PATH,
     )
 
-    static_files_path = Path(__file__).parent.parent / "static"
+    static_files_path = Path(__file__).resolve().parent.parent.parent / "static"
 
     @app.get("/static/{full_path:path}")
     async def serve_file(full_path: str):
@@ -98,17 +89,11 @@ def general_create_app(
 
     @app.get(basicSettings.SWAGGER_OPENAPI_JSON_URL, include_in_schema=False)
     async def get_openapi():
-        """
-        Endpoint to serve the OpenAPI schema.
-        """
         return app.openapi()
 
     if enable_root_route:
         @app.get("/", response_model=dict, status_code=200)
         def read_root():
-            """
-            Root endpoint that returns a simple message.
-            """
             return {"message": f"Welcome to {basicSettings.APP_NAME}!"}
 
     return app
