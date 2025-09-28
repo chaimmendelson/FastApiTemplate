@@ -1,24 +1,24 @@
+"""Utility helpers for general application configuration."""
+
 from pydantic import ValidationError
+from loguru import logger
 
 from .logger import Logger
 from .config import BasicSettings
-from loguru import logger
 
 
-def update_basic_settings(settings: BasicSettings):
+def update_basic_settings(settings: BasicSettings) -> None:
     if settings.PROXIED:
         settings.PROXY_LISTEN_PATH = settings.PROXY_LISTEN_PATH.rstrip("/")
         settings.SWAGGER_STATIC_FILES = (
-                settings.PROXY_LISTEN_PATH + "/" +
-                settings.SWAGGER_STATIC_FILES.lstrip("/")
+            settings.PROXY_LISTEN_PATH + "/" + settings.SWAGGER_STATIC_FILES.lstrip("/")
         )
         settings.SWAGGER_OPENAPI_JSON_URL = (
-                settings.PROXY_LISTEN_PATH + "/" +
-                settings.OPENAPI_JSON_URL.lstrip("/")
+            settings.PROXY_LISTEN_PATH + "/" + settings.OPENAPI_JSON_URL.lstrip("/")
         )
-        
+
         settings.LOG_REQUEST_EXCLUDE_PATHS.extend([
-            settings.PROXY_LISTEN_PATH + "/" + path.lstrip("/") 
+            settings.PROXY_LISTEN_PATH + "/" + path.lstrip("/")
             for path in settings.LOG_REQUEST_EXCLUDE_PATHS
         ])
 
@@ -34,6 +34,6 @@ except ValidationError as e:
         f"Configuration error: {e}\n"
         "Please ensure that all required environment variables are set correctly."
     )
-    exit(1)
+    raise SystemExit(1) from e
 
 logger_config = Logger(basicSettings.LOG_LEVEL)
