@@ -9,7 +9,7 @@ instance with logging, metrics, documentation, and health-check routes ready to 
 ### Installation
 
 ```bash
-pip install fastapi-template
+pip install horizen-fastapi-template
 ```
 
 ### Usage
