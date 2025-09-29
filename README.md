@@ -17,7 +17,7 @@ pip install horizen-fastapi-template
 Create a new file (for example `main.py`) and bootstrap your API:
 
 ```python
-from fastapi_template import create_app
+from horizen_fastapi_template import create_app
 
 app = create_app()
 ```
