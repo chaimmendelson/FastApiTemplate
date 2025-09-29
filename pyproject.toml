@@ -5,8 +5,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "fastapi-template"
 version = "0.1.0"
-description = """ A reusable FastAPI application factory
-                  The main contributor and maintainer is Chaim Mendelson, with contributions from Yehonatan Magen."""
+description = """A reusable FastAPI application factory
+The main contributor and maintainer is Chaim Mendelson, with contributions from Yehonatan Magen."""
 readme = "README.md"
 authors = [{ name = "Chaim Mendelson and Yehonatan Magen" }]
 license = { file = "LICENSE" }
@@ -23,12 +23,10 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 
 [tool.setuptools.package-data]
 fastapi_template = ["static/**"]
 
-[tool.poetry]
-packages = [{ include = "fastapi_template", from = "src" }]
-
-include = ["src/fastapi_template/static/**"]
+[tool.setuptools]
+include-package-data = true
