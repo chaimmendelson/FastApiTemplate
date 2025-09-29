@@ -1,9 +1,11 @@
+"""Async FTP client utility."""
+
 from contextlib import asynccontextmanager
+from io import BytesIO
 from pathlib import Path
+from typing import AsyncGenerator, Optional
 
 import aioftp
-from io import BytesIO
-from typing import Optional, AsyncGenerator
 
 
 class AsyncFTPClient:
@@ -33,8 +35,7 @@ class AsyncFTPClient:
         base_dir: str = ".",
         override: bool = True,
     ) -> "AsyncFTPClient":
-        instance = cls(host, user, password, port, base_dir, override)
-        return instance
+        return cls(host, user, password, port, base_dir, override)
 
     @asynccontextmanager
     async def _get_client(self) -> AsyncGenerator[aioftp.Client, None]:
@@ -49,23 +50,19 @@ class AsyncFTPClient:
 
     async def pwd(self) -> str:
         async with self._get_client() as client:
-            client: aioftp.Client = client
             return str(await client.get_current_directory())
 
     async def cd(self, path: str) -> None:
         async with self._get_client() as client:
-            client: aioftp.Client = client
             await client.change_directory(path)
 
     async def list(self) -> list[str]:
         async with self._get_client() as client:
-            client: aioftp.Client = client
             entry_list = await client.list()
             return [entry[0].name for entry in entry_list]
 
     async def rename(self, name: str, new_name: str) -> None:
         async with self._get_client() as client:
-            client: aioftp.Client = client
             if not await self.file_exists(name):
                 raise FileNotFoundError(f"File '{name}' does not exist.")
             if await self.file_exists(new_name):
@@ -77,9 +74,7 @@ class AsyncFTPClient:
 
     async def download(self, filename: str) -> bytes:
         async with self._get_client() as client:
-            client: aioftp.Client = client
             data_stream = BytesIO()
-
             async with client.download_stream(filename) as stream:
                 data_stream.write(await stream.read())
 
@@ -88,7 +83,6 @@ class AsyncFTPClient:
 
     async def upload(self, filename: str, content: bytes) -> None:
         async with self._get_client() as client:
-            client: aioftp.Client = client
             data_stream = BytesIO(content)
             temp_name = f"{filename}.tmp"
 
@@ -100,24 +94,21 @@ class AsyncFTPClient:
     async def upload_from_file(self, local_path: str, remote_name: Optional[str] = None) -> None:
         remote_name = remote_name or Path(local_path).name
         async with self._get_client() as client:
-            client: aioftp.Client = client
             temp_name = f"{remote_name}.tmp"
             async with aioftp.PathIO() as aio:
-                async with aio.open(local_path, "rb") as f:
-                    await client.upload(f, temp_name)
+                async with aio.open(local_path, "rb") as file_handle:
+                    await client.upload(file_handle, temp_name)
 
             await self.rename(temp_name, remote_name)
 
     async def download_to_file(self, remote_name: str, local_path: str) -> None:
         async with self._get_client() as client:
-            client: aioftp.Client = client
             async with aioftp.PathIO() as aio:
-                async with aio.open(local_path, "wb") as f:
-                    await client.download(remote_name, f)
+                async with aio.open(local_path, "wb") as file_handle:
+                    await client.download(remote_name, file_handle)
 
     async def delete(self, filename: str) -> None:
         async with self._get_client() as client:
-            client: aioftp.Client = client
             await client.remove_file(filename)
 
     async def file_exists(self, filename: str) -> bool:
