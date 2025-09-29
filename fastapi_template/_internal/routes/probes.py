@@ -1,4 +1,4 @@
-"""Health probe endpoints for the FastAPI Tash application."""
+"""Health probe endpoints for the FastAPI Template application."""
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse

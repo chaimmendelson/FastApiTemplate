@@ -1,4 +1,4 @@
-"""Logging helpers for the FastAPI Tash application."""
+"""Logging helpers for the FastAPI Template application."""
 
 import logging
 import logging.config

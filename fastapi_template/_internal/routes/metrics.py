@@ -1,4 +1,4 @@
-"""Prometheus metrics endpoint for the FastAPI Tash application."""
+"""Prometheus metrics endpoint for the FastAPI Template application."""
 
 from fastapi import APIRouter, Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest

@@ -1,4 +1,4 @@
-"""Settings definition for the FastAPI Tash application factory."""
+"""Settings definition for the FastAPI Template application factory."""
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict

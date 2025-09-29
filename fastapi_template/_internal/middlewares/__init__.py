@@ -1,4 +1,4 @@
-"""Middleware configuration for the FastAPI Tash application."""
+"""Middleware configuration for the FastAPI Template application."""
 
 from fastapi import FastAPI
 

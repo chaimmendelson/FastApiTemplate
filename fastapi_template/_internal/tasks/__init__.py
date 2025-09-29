@@ -1,4 +1,4 @@
-"""Background task registration for the FastAPI Tash application."""
+"""Background task registration for the FastAPI Template application."""
 
 from __future__ import annotations
 

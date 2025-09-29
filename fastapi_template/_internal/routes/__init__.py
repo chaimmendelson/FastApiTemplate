@@ -1,4 +1,4 @@
-"""Router registration for the FastAPI Tash application."""
+"""Router registration for the FastAPI Template application."""
 
 from fastapi import FastAPI
 

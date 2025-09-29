@@ -1,4 +1,4 @@
-"""Core application wiring for the FastAPI Tash package."""
+"""Core application wiring for the FastAPI Template package."""
 
 import asyncio
 from contextlib import asynccontextmanager

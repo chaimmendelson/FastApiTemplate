@@ -1,4 +1,4 @@
-"""Exception handlers used by the FastAPI Tash application."""
+"""Exception handlers used by the FastAPI Template application."""
 
 from fastapi import HTTPException, Request
 from fastapi.exceptions import RequestValidationError
