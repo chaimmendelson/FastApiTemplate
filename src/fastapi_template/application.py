@@ -2,9 +2,9 @@
 
 from fastapi import FastAPI
 
-from ._internal.general import basicSettings, general_create_app, logger_config
-from ._internal.src import update_app, async_background_tasks
+from ._internal import settings, general_create_app, logger_config
 
+async_background_tasks: list = []
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application.
@@ -18,7 +18,7 @@ def create_app() -> FastAPI:
     app = general_create_app(
         async_background_tasks=async_background_tasks,
     )
-    app.state.settings = basicSettings
+
+    app.state.settings = settings
     app.state.logger_config = logger_config
-    update_app(app)
     return app

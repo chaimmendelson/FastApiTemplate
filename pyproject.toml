@@ -3,7 +3,7 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fastapi-tash"
+name = "fastapi-template"
 version = "0.1.0"
 description = "A reusable FastAPI application factory"
 readme = "README.md"
@@ -29,7 +29,12 @@ package-dir = {"" = "package"}
 include-package-data = true
 
 [tool.setuptools.packages.find]
-where = ["package"]
+where = ["src"]
 
 [tool.setuptools.package-data]
-fastapi_tash = ["static/**/*"]
+fastapi_template = ["static/**"]
+
+[tool.poetry]
+packages = [{ include = "fastapi_template", from = "src" }]
+
+include = ["src/fastapi_template/static/**"]
