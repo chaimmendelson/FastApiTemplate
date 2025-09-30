@@ -3,7 +3,8 @@
 import logging
 import logging.config
 import sys
-
+import traceback as _tb
+import os
 from loguru import logger
 
 
@@ -16,17 +17,6 @@ class UvicornHandler(logging.Handler):
         )
 
 
-def base_formatter(record: dict) -> str:
-    extra = record.get("extra", {}).get("extra", {})
-    location = extra.get("location", "{name}:{function}:{line}")
-    return (
-        "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
-        "<level>{level:<8}</level> | "
-        f"<cyan>{location}</cyan> - "
-        "<level>{message}</level>\n"
-    )
-
-
 def setup_loguru(log_level: str = "INFO") -> None:
     logger.remove()
     logger.add(
@@ -35,6 +25,36 @@ def setup_loguru(log_level: str = "INFO") -> None:
         format=base_formatter,
         backtrace=False,
         diagnose=False,
+    )
+
+
+def base_formatter(record: dict) -> str:
+    if record["exception"]:
+        tb = record["exception"].traceback
+        frames = _tb.extract_tb(tb)
+
+        user_frame = None
+        for frame in reversed(frames):
+            path = os.path.abspath(frame.filename)
+            if "site-packages" not in path and "lib/python" not in path:
+                user_frame = frame
+                break
+
+        if user_frame:
+            location = f"{user_frame.filename}:{user_frame.name}:{user_frame.lineno}"
+        else:
+
+            last = frames[-1]
+            location = f"{last.filename}:{last.name}:{last.lineno}"
+    else:
+        # normal logs
+        location = f"{record['file'].name}:{record['function']}:{record['line']}"
+
+    return (
+        "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+        "<level>{level:<8}</level> | "
+        f"<cyan>{location}</cyan> : "
+        "<level>{message}</level>\n"
     )
 
 
