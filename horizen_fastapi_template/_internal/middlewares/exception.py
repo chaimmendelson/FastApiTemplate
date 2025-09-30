@@ -21,19 +21,17 @@ def _unhandled_exception_message() -> dict:
 
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
-    logger.info("HTTP error %s: %s", exc.status_code, exc.detail)
+    logger.opt(exception=exc).error(f"HTTP error {exc.status_code}: {exc.detail}")
     return JSONResponse(status_code=exc.status_code, content=_http_exception_message(exc))
 
 
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
-    logger.info("Validation error: %s", exc.errors())
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    logger.opt(exception=exc).error(f"Validation error: {exc.errors()}")
     return JSONResponse(status_code=422, content=_validation_exception_message(exc))
 
 
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    logger.error("Unhandled error: %s", exc)
+    logger.opt(exception=exc).error(f"Unhandled error: {exc}")
     return JSONResponse(status_code=500, content=_unhandled_exception_message())
 
 
