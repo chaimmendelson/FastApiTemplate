@@ -10,71 +10,42 @@ from loguru import logger
 
 PROJECT_ROOT = os.path.abspath(os.getenv("PROJECT_ROOT", os.getcwd()))
 PY_VER = f"python{sys.version_info.major}.{sys.version_info.minor}"
+_SITE_MARKERS = (f"{os.sep}site-packages{os.sep}", f"{os.sep}dist-packages{os.sep}")
+
 
 def _in_package(path: str) -> bool:
     ap = os.path.abspath(path)
     return ("site-packages" in ap) or (f"{os.sep}lib{os.sep}{PY_VER}{os.sep}" in ap)
 
+
+def _strip_prefix(path: str) -> str:
+    for marker in _SITE_MARKERS:
+        if marker in path:
+            return path.split(marker, 1)[1]
+    return path
+
+
 def _to_module(path: str) -> str:
     ap = os.path.abspath(path)
-    module: str
+
     if ap.startswith(PROJECT_ROOT):
         rel = os.path.relpath(ap, PROJECT_ROOT)
-        if rel.endswith(".py"):
-            rel = rel[:-3]
-        module = rel.replace(os.sep, ".")
     else:
-        module = ""
-        best_depth = None
+        rel = _strip_prefix(ap)
+        if rel == ap:
+            rel = os.path.basename(ap)
 
-        for entry in filter(None, sys.path):
-            try:
-                root = os.path.abspath(entry)
-            except (OSError, RuntimeError):
-                continue
+    rel = rel.replace(os.sep, ".")
+    if rel.endswith(".py"):
+        rel = rel[:-3]
 
-            try:
-                common = os.path.commonpath([ap, root])
-            except ValueError:
-                continue
+    if rel.endswith(".__init__"):
+        rel = rel[: -len(".__init__")]
+    elif rel.endswith("__init__"):
+        parent = os.path.basename(os.path.dirname(ap))
+        rel = parent or rel[:-len("__init__")] or "__init__"
 
-            if common != root:
-                continue
-
-            rel = os.path.relpath(ap, root)
-            if rel.startswith(".."):
-                continue
-
-            depth = rel.count(os.sep)
-            candidate = os.path.splitext(rel)[0].replace(os.sep, ".")
-
-            if not candidate:
-                continue
-
-            if best_depth is None or depth < best_depth:
-                best_depth = depth
-                module = candidate
-
-        if not module:
-            module = os.path.splitext(os.path.basename(ap))[0]
-            if module == "__init__":
-                parent = os.path.basename(os.path.dirname(ap))
-                module = parent or module
-
-    for needle in (".site-packages.", ".dist-packages."):
-        if needle in module:
-            module = module.split(needle, 1)[1]
-            break
-
-    for prefix in ("site-packages.", "dist-packages."):
-        if module.startswith(prefix):
-            module = module[len(prefix):]
-            break
-
-    if module.endswith(".__init__"):
-        module = module[: -len(".__init__")]
-
-    return module
+    return rel
 
 
 def _format_frame(frame: _tb.FrameSummary) -> str:
@@ -82,30 +53,33 @@ def _format_frame(frame: _tb.FrameSummary) -> str:
     return f"{module}:{frame.name}:{frame.lineno}"
 
 
+def _is_project_frame(frame: _tb.FrameSummary) -> bool:
+    ap = os.path.abspath(frame.filename)
+    return ap.startswith(PROJECT_ROOT) and not _in_package(ap)
+
+
 def _exception_path(frames: Iterable[_tb.FrameSummary]) -> List[str]:
     frames_list = list(frames)
-    selected: List[_tb.FrameSummary] = []
+    if not frames_list:
+        return []
+
+    project_frames = [frame for frame in frames_list if _is_project_frame(frame)]
+    candidates = project_frames or [frame for frame in frames_list if not _in_package(frame.filename)]
+    if not candidates:
+        candidates = [frames_list[-1]]
+
+    if frames_list[-1] not in candidates:
+        candidates.append(frames_list[-1])
+
     seen = set()
-
-    for frame in frames_list:
-        ap = os.path.abspath(frame.filename)
+    ordered: List[_tb.FrameSummary] = []
+    for frame in candidates:
         key = (frame.filename, frame.lineno, frame.name)
-        if ap.startswith(PROJECT_ROOT) and not _in_package(ap):
-            if key not in seen:
-                selected.append(frame)
-                seen.add(key)
-        elif not selected and not _in_package(frame.filename):
-            if key not in seen:
-                selected.append(frame)
-                seen.add(key)
-
-    if frames_list:
-        final = frames_list[-1]
-        key = (final.filename, final.lineno, final.name)
         if key not in seen:
-            selected.append(final)
+            ordered.append(frame)
+            seen.add(key)
 
-    return [_format_frame(frame) for frame in selected]
+    return [_format_frame(frame) for frame in ordered]
 
 class UvicornHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover - thin wrapper
