@@ -18,8 +18,9 @@ dependencies = [
     "kubernetes-asyncio>=29.0",
     "loguru>=0.7",
     "prometheus-client>=0.17",
-    "pydantic>=2.0",
+    "pydantic>=2.11.10",
     "pydantic-settings>=2.0",
+    "strawberry-graphql[fastapi]>=0.118.0",
     "uvicorn>=0.24",
 ]
 

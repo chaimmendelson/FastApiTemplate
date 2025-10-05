@@ -77,6 +77,12 @@ class ApplicationSettings(BaseSettings):
 
     SWAGGER_OPENAPI_JSON_URL: str = OPENAPI_JSON_URL
 
+    GRAPHIQL_STATIC_FILES: str = Field(
+        default="static/graphiql",
+        description="URL path to serve Graphql UI static files.",
+        examples=["static/qraphiql"],
+    )
+
     LOG_REQUEST_EXCLUDE_PATHS: list[str] = Field(
         default=["/health", "/metrics", "/static", "/docs", "/redoc", "/openapi.json", "/.well-known"],
         description="List of paths to ignore for logging.",
