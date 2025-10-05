@@ -5,24 +5,82 @@ import logging.config
 import sys
 import traceback as _tb
 import os
+from typing import Iterable, List
 from loguru import logger
 from uvicorn.config import LOGGING_CONFIG as UVICORN_LOGGING_CONFIG
 
 PROJECT_ROOT = os.path.abspath(os.getenv("PROJECT_ROOT", os.getcwd()))
 PY_VER = f"python{sys.version_info.major}.{sys.version_info.minor}"
+_SITE_MARKERS = (f"{os.sep}site-packages{os.sep}", f"{os.sep}dist-packages{os.sep}")
+
 
 def _in_package(path: str) -> bool:
     ap = os.path.abspath(path)
     return ("site-packages" in ap) or (f"{os.sep}lib{os.sep}{PY_VER}{os.sep}" in ap)
 
+
+def _strip_prefix(path: str) -> str:
+    for marker in _SITE_MARKERS:
+        if marker in path:
+            return path.split(marker, 1)[1]
+    return path
+
+
 def _to_module(path: str) -> str:
     ap = os.path.abspath(path)
+
     if ap.startswith(PROJECT_ROOT):
         rel = os.path.relpath(ap, PROJECT_ROOT)
-        if rel.endswith(".py"):
-            rel = rel[:-3]
-        return rel.replace(os.sep, ".")
-    return os.path.basename(ap).removesuffix(".py")
+    else:
+        rel = _strip_prefix(ap)
+        if rel == ap:
+            rel = os.path.basename(ap)
+
+    rel = rel.replace(os.sep, ".")
+    if rel.endswith(".py"):
+        rel = rel[:-3]
+
+    if rel.endswith(".__init__"):
+        rel = rel[: -len(".__init__")]
+    elif rel.endswith("__init__"):
+        parent = os.path.basename(os.path.dirname(ap))
+        rel = parent or rel[:-len("__init__")] or "__init__"
+
+    return rel
+
+
+def _format_frame(frame: _tb.FrameSummary) -> str:
+    module = _to_module(frame.filename)
+    return f"{module}:{frame.name}:{frame.lineno}"
+
+
+def _is_project_frame(frame: _tb.FrameSummary) -> bool:
+    ap = os.path.abspath(frame.filename)
+    return ap.startswith(PROJECT_ROOT) and not _in_package(ap)
+
+
+def _exception_path(frames: Iterable[_tb.FrameSummary]) -> List[str]:
+    frames_list = list(frames)
+    if not frames_list:
+        return []
+
+    project_frames = [frame for frame in frames_list if _is_project_frame(frame)]
+    candidates = project_frames or [frame for frame in frames_list if not _in_package(frame.filename)]
+    if not candidates:
+        candidates = [frames_list[-1]]
+
+    if frames_list[-1] not in candidates:
+        candidates.append(frames_list[-1])
+
+    seen = set()
+    ordered: List[_tb.FrameSummary] = []
+    for frame in candidates:
+        key = (frame.filename, frame.lineno, frame.name)
+        if key not in seen:
+            ordered.append(frame)
+            seen.add(key)
+
+    return [_format_frame(frame) for frame in ordered]
 
 class UvicornHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover - thin wrapper
@@ -55,41 +113,49 @@ def base_formatter(record: dict) -> str:
         module = record["name"]          # dotted module
         func = record["function"]
         line = record["line"]
+        location = None
 
         if record["exception"]:
             tb = record["exception"].traceback
             frames = _tb.extract_tb(tb)  # oldest -> newest
-            chosen = None
+            path_segments = _exception_path(frames)
 
-            # prefer first frame under your project root
-            for fr in reversed(frames):
-                ap = os.path.abspath(fr.filename)
-                if ap.startswith(PROJECT_ROOT) and not _in_package(ap):
-                    chosen = fr
-                    break
+            if path_segments:
+                location = " -> ".join(path_segments)
+            else:
+                chosen = None
 
-            # fallback, first non package frame
-            if chosen is None:
+                # prefer first frame under your project root
                 for fr in reversed(frames):
-                    if not _in_package(fr.filename):
+                    ap = os.path.abspath(fr.filename)
+                    if ap.startswith(PROJECT_ROOT) and not _in_package(ap):
                         chosen = fr
                         break
 
-            # final fallback, raise site
-            if chosen is None and frames:
-                chosen = frames[-1]
+                # fallback, first non package frame
+                if chosen is None:
+                    for fr in reversed(frames):
+                        if not _in_package(fr.filename):
+                            chosen = fr
+                            break
 
-            if chosen:
-                module = _to_module(chosen.filename)
-                func = chosen.name
-                line = chosen.lineno
+                # final fallback, raise site
+                if chosen is None and frames:
+                    chosen = frames[-1]
+
+                if chosen:
+                    module = _to_module(chosen.filename)
+                    func = chosen.name
+                    line = chosen.lineno
+                location = f"{module}:{func}:{line}"
         else:
             # regular logs, prefer module from file path when it is in your project
             ap = record["file"].path
             if ap and ap.startswith(PROJECT_ROOT) and not _in_package(ap):
                 module = _to_module(ap)
 
-        location = f"{module}:{func}:{line}"
+        if location is None:
+            location = f"{module}:{func}:{line}"
 
     return (
         "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
