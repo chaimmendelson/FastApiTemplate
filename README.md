@@ -58,7 +58,7 @@ those modules are considered private and may change without notice.
   assets bundled with the package.
 * **Middleware** – Request timing, exception handling, and request logging
   middleware that can be toggled through configuration flags.
-* **Utilities** – Helper clients for HTTP APIs, FTP servers, and Kubernetes
+* **Utilities** – Helper clients for HTTP APIs, Bitbucket API, FTP servers, and Kubernetes
   interactions, plus shared Pydantic models for error responses.
 
 ## 📁 Project Structure
@@ -70,10 +70,11 @@ FastApiTemplate/
 ├── package/
 │   └── fastapi_template/
 │       ├── __init__.py       # Public package exposing `create_app`
-│       ├── application.py    # Application factory implementation
+│       ├── utils.py          # Public utility functions and classes
 │       ├── _internal/        # Private framework modules
 │       └── static/           # Bundled static assets for Swagger UI
 ├── pyproject.toml            # Packaging metadata
+├── requirements.txt         # Pinning dependencies for development
 └── README.md
 ```
 

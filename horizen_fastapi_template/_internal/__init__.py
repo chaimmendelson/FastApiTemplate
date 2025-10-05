@@ -6,10 +6,8 @@ from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Coroutine
 
 from fastapi.staticfiles import StaticFiles
-from importlib.resources import files
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI
 
 from .middlewares import add_middlewares
 from .routes import add_routers

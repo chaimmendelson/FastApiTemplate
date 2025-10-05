@@ -17,7 +17,7 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
         ):
             log_level = "DEBUG"
 
-        logger.log(log_level, f"[Request] {request.method} {request.url.path}")
+        logger.log(log_level, f"{request.method} {request.url.path}", extra={"location": "Request"})
 
         response = await call_next(request)
 
@@ -25,7 +25,7 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
 
         logger.log(
             log_level,
-            f"[Response] {request.method} {request.url.path} {response.status_code} {process_time}",
+            f"{request.method} {request.url.path} {response.status_code} {process_time}", extra={"location": "Response"}
         )
 
         return response

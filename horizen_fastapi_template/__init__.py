@@ -1,9 +1,7 @@
 """FastAPI application template package."""
-__version__ = "0.1.0"
-
 from ._internal import general_create_app
 
-__all__ = ["general_create_app", "__version__"]
+__all__ = ["general_create_app"]
 
 
 def __getattr__(name: str):

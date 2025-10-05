@@ -7,11 +7,13 @@ class BaseAPI:
         self,
         base_url: str,
         headers: Optional[Dict[str, str]] = None,
+        auth: Optional[Tuple[str, str]] = None,
         timeout: Optional[float] = 10.0,
         verify: bool = False,
     ):
         self.base_url = base_url.rstrip("/")
         self.headers = headers or {}
+        self.auth = auth
         self.timeout = timeout
         self.verify = verify
 
@@ -24,8 +26,10 @@ class BaseAPI:
         json: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
         files: Optional[List[Tuple[str, Tuple[str, bytes, str]]]] = None,
+        **kwargs: Any,
     ) -> httpx.Response:
-        url = f"{self.base_url}/{endpoint.lstrip('/')}"
+        url = f"{self.base_url}/{endpoint.removeprefix(self.base_url).removeprefix('/')}"
+
         merged_headers = {**self.headers, **(headers or {})}
 
         try:
@@ -34,6 +38,7 @@ class BaseAPI:
                 headers=self.headers,
                 timeout=self.timeout,
                 verify=self.verify,
+                auth=self.auth,
             ) as client:
                 response = await client.request(
                     method=method.upper(),
@@ -43,6 +48,7 @@ class BaseAPI:
                     json=json,
                     headers=merged_headers,
                     files=files,
+                    **kwargs,
                 )
                 return response  # Always return response, caller decides what to do with status code
         except httpx.RequestError as e:

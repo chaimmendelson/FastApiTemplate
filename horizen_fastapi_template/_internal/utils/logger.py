@@ -6,6 +6,7 @@ import sys
 import traceback as _tb
 import os
 from loguru import logger
+from uvicorn.config import LOGGING_CONFIG as UVICORN_LOGGING_CONFIG
 
 PROJECT_ROOT = os.path.abspath(os.getenv("PROJECT_ROOT", os.getcwd()))
 PY_VER = f"python{sys.version_info.major}.{sys.version_info.minor}"
@@ -99,17 +100,15 @@ def base_formatter(record: dict) -> str:
 
 
 
-def get_logging_dict(log_level: str = "INFO") -> dict:
-    return {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "handlers": {
+def configure_uvicorn(log_level: str = "INFO") -> None:
+    UVICORN_LOGGING_CONFIG["handlers"] = {
             "UvicornHandler": {
                 "level": log_level.upper(),
                 "()": UvicornHandler,
             }
-        },
-        "loggers": {
+        }
+
+    UVICORN_LOGGING_CONFIG["loggers"] = {
             "uvicorn": {
                 "level": log_level.upper(),
                 "handlers": ["UvicornHandler"],
@@ -120,12 +119,10 @@ def get_logging_dict(log_level: str = "INFO") -> dict:
                 "handlers": [],
                 "propagate": False,
             },
-        },
-    }
+        }
 
 
 class Logger:
     def __init__(self, log_level: str = "INFO") -> None:
         setup_loguru(log_level)
-        self.dict_config = get_logging_dict(log_level)
-        logging.config.dictConfig(self.dict_config)
+        configure_uvicorn(log_level)

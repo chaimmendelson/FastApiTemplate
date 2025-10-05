@@ -20,6 +20,7 @@ dependencies = [
     "prometheus-client>=0.17",
     "pydantic>=2.0",
     "pydantic-settings>=2.0",
+    "uvicorn>=0.24",
 ]
 
 [tool.setuptools.packages.find]
