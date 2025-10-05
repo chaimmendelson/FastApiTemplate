@@ -53,7 +53,7 @@ class BitbucketAPI(BaseAPI):
 
         # Handle deletions
         if delete:
-            data["files"] = "\n".join(delete)
+            data["files"] = delete
 
         response = await self.post(endpoint, data=data, files=files_payload)
         if response.status_code >= 400:
