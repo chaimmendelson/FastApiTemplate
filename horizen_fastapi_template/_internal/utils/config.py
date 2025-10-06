@@ -84,7 +84,7 @@ class ApplicationSettings(BaseSettings):
     )
 
     LOG_REQUEST_EXCLUDE_PATHS: list[str] = Field(
-        default=["/health", "/metrics", "/static", "/docs", "/redoc", "/openapi.json", "/.well-known"],
+        default=["/health", "/metrics", "/static", "/docs", "/redoc", "/openapi.json", "/.well-known", "/graphql/v.*/playground"],
         description="List of paths to ignore for logging.",
         examples=[["/health", "/metrics"]],
     )

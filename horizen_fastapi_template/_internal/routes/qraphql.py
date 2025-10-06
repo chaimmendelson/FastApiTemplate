@@ -1,32 +1,44 @@
 from pathlib import Path
 
 import strawberry
-from fastapi import FastAPI
+from fastapi import APIRouter, HTTPException
 from starlette.responses import FileResponse
-from starlette.staticfiles import StaticFiles
 from strawberry.fastapi import GraphQLRouter
 
 from ..models.graphql import GraphQLVersion
 
-def create_graphql_route(
-        app: FastAPI,
+def create_graphql_router(
         version: GraphQLVersion,
         static_files_path: Path
-) -> None:
+) -> APIRouter:
 
     schema = strawberry.Schema(query=version.query)
 
-    graphql_app = GraphQLRouter(schema, graphql_ide="graphiql", context_getter=version.context_getter)
-
-    # Add the GraphQL route to FastAPI
-    app.include_router(graphql_app, prefix=f"/graphql/{version.version}")
-
-    app.mount(
-        f"/graphql/{version.version}/playground/static",
-        StaticFiles(directory=f"{static_files_path}/static"),
-        name="static"
+    graphql_app = GraphQLRouter(
+        schema,
+        prefix=f"/graphql/{version.version}",
+        context_getter=version.context_getter,
+        graphiql=False
     )
 
-    @app.get(f"/graphql/{version.version}/playground", include_in_schema=False)
+    # Define paths
+    static_dir = Path(static_files_path) / "static"
+    index_file = Path(static_files_path) / "index.html"
+
+    # Serve the playground HTML
+    @graphql_app.get("/playground")
     async def playground():
-        return FileResponse(f"{static_files_path}/index.html", media_type="text/html")
+        if not index_file.exists():
+            raise HTTPException(status_code=404, detail="Playground not found")
+        return FileResponse(index_file, media_type="text/html")
+
+    # Serve static files under /playground/static
+    @graphql_app.get("/playground/static/{file_path:path}")
+    async def playground_static(file_path: str):
+        file = static_dir / file_path
+        if not file.exists() or not file.is_file():
+            print(file)
+            raise HTTPException(status_code=404, detail="File not found")
+        return FileResponse(file)
+
+    return graphql_app

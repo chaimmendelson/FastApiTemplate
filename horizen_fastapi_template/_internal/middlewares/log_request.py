@@ -1,4 +1,5 @@
 """Middleware for logging incoming HTTP requests."""
+import re
 
 from fastapi import Request
 from loguru import logger
@@ -12,7 +13,7 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
         log_level = "INFO"
 
         if any(
-            request.url.path.startswith(prefix)
+            request.url.path.startswith(prefix) or re.match(prefix, request.url.path)
             for prefix in settings.LOG_REQUEST_EXCLUDE_PATHS
         ):
             log_level = "DEBUG"

@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from .metrics import metrics_router
 from .probes import health_router
 from .swagger import router as swagger_router
-from .qraphql import create_graphql_route
+from .qraphql import create_graphql_router
 from ..models import GraphQLVersion
 
 
@@ -34,5 +34,5 @@ def add_graphql_routes(app: FastAPI, versions: List[GraphQLVersion], static_file
     """Attach GraphQL routes to the application."""
 
     for version in versions:
-        create_graphql_route(app, version, static_files)
+        app.include_router(create_graphql_router(version, static_files), include_in_schema=True)
 
