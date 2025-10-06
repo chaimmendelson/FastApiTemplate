@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "horizon-fastapi-template"
-version = "0.0.0.0.dev1"
+version = "0.0.1.dev1"
 description = """A reusable FastAPI application factory
 The main contributor and maintainer is Chaim Mendelson, with contributions from Yehonatan Magen."""
 readme = "README.md"
