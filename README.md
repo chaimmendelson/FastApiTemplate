@@ -9,7 +9,7 @@ instance with logging, metrics, documentation, and health-check routes ready to 
 ### Installation
 
 ```bash
-pip install horizen-fastapi-template
+pip install horizon-fastapi-template
 ```
 
 ### Usage
@@ -17,7 +17,7 @@ pip install horizen-fastapi-template
 Create a new file (for example `main.py`) and bootstrap your API:
 
 ```python
-from horizen_fastapi_template import create_app
+from horizon_fastapi_template import create_app
 
 app = create_app()
 ```

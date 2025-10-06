@@ -65,7 +65,7 @@ jobs:
       #
       # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
       # ALTERNATIVE: exactly, uncomment the following line instead:
-      url: https://pypi.org/project/horizen-fastapi-template/${{ github.event.release.name }}
+      url: https://pypi.org/project/horizon-fastapi-template/${{ github.event.release.name }}
 
     steps:
       - name: Retrieve release distributions
