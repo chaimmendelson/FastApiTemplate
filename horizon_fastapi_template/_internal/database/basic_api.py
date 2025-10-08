@@ -1,14 +1,13 @@
 import httpx
 from typing import Optional, Dict, Any, Union, List, Tuple
 
-
 class BaseAPI:
     def __init__(
         self,
         base_url: str,
         headers: Optional[Dict[str, str]] = None,
         auth: Optional[Tuple[str, str]] = None,
-        timeout: Optional[float] = 10.0,
+        timeout: float = 10.0,
         verify: bool = False,
     ):
         self.base_url = base_url.rstrip("/")
@@ -16,7 +15,29 @@ class BaseAPI:
         self.auth = auth
         self.timeout = timeout
         self.verify = verify
+        self._client: Optional[httpx.AsyncClient] = None  # used only for 'with'
 
+    # --------------------------
+    # Context manager for session
+    # --------------------------
+    async def __aenter__(self) -> "BaseAPI":
+        self._client = httpx.AsyncClient(
+            base_url=self.base_url,
+            headers=self.headers,
+            timeout=self.timeout,
+            verify=self.verify,
+            auth=self.auth,
+        )
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if self._client:
+            await self._client.aclose()
+            self._client = None
+
+    # --------------------------
+    # Core request method
+    # --------------------------
     async def request(
         self,
         method: str,
@@ -29,10 +50,21 @@ class BaseAPI:
         **kwargs: Any,
     ) -> httpx.Response:
         url = f"{self.base_url}/{endpoint.removeprefix(self.base_url).removeprefix('/')}"
-
         merged_headers = {**self.headers, **(headers or {})}
 
-        try:
+        # Use the client if inside a context, otherwise a temporary client
+        if self._client:
+            return await self._client.request(
+                method=method.upper(),
+                url=url,
+                params=params,
+                data=data,
+                json=json,
+                headers=merged_headers,
+                files=files,
+                **kwargs,
+            )
+        else:
             async with httpx.AsyncClient(
                 base_url=self.base_url,
                 headers=self.headers,
@@ -40,7 +72,7 @@ class BaseAPI:
                 verify=self.verify,
                 auth=self.auth,
             ) as client:
-                response = await client.request(
+                return await client.request(
                     method=method.upper(),
                     url=url,
                     params=params,
@@ -50,10 +82,8 @@ class BaseAPI:
                     files=files,
                     **kwargs,
                 )
-                return response  # Always return response, caller decides what to do with status code
-        except httpx.RequestError as e:
-            raise RuntimeError(f"Request failed: {str(e)}") from e
 
+    # HTTP helpers
     async def get(self, endpoint: str, **kwargs) -> httpx.Response:
         return await self.request("GET", endpoint, **kwargs)
 
@@ -92,6 +122,3 @@ class BaseAPI:
     ) -> bytes:
         response = await self.get(endpoint)
         return response.content
-
-    async def close(self):
-        await self.client.aclose()
