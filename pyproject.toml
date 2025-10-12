@@ -27,8 +27,11 @@ dependencies = [
     "respx>=0.18.0",
 ]
 
+
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["horizon_fastapi_template", "horizon_fastapi_template.*"]
+exclude = ["horizon_fastapi_template.tests*"]
 
 [tool.setuptools.package-data]
 horizon_fastapi_template = ["static/**"]
@@ -37,7 +40,7 @@ horizon_fastapi_template = ["static/**"]
 include-package-data = true
 
 [tool.pytest.ini_options]
-testpaths = ["horizon_fastapi_template/_tests"]
+testpaths = ["horizon_fastapi_template/tests"]
 python_files = ["test_*.py", "*_test.py"]
 
 addopts = "-ra -q --disable-warnings --strict-markers"
