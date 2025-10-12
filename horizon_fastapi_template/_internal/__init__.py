@@ -3,7 +3,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, AsyncGenerator, Callable, Coroutine
+from typing import Any, AsyncGenerator, Callable, Coroutine, List
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI
 
@@ -17,7 +17,7 @@ __all__ = ["general_create_app", "settings", "logger_config"]
 
 def general_create_app(
     *,
-    async_background_tasks: list[Callable[[], Coroutine]] | None = None,
+    async_background_tasks: List[Callable[[], Coroutine]] = None,
     enable_logging_middleware: bool = True,
     enable_time_recording_middleware: bool = True,
     enable_root_route: bool = True,
@@ -26,7 +26,7 @@ def general_create_app(
     enable_metrics_route: bool = True,
     enable_swagger_routes: bool = True,
     enable_probe_routes: bool = True,
-    graphql_versions: list[GraphQLVersion] | None = None,
+    graphql_versions: List[GraphQLVersion] = None,
     **fastapi_kwargs: Any,
 ) -> FastAPI:
     """Create and configure the FastAPI application."""
