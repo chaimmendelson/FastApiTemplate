@@ -22,6 +22,9 @@ dependencies = [
     "pydantic-settings>=2.0",
     "strawberry-graphql[fastapi]>=0.118.0",
     "uvicorn>=0.24",
+    "pytest>=7.4",
+    "pytest-asyncio>=0.22",
+    "respx>=0.24",
 ]
 
 [tool.setuptools.packages.find]
@@ -32,3 +35,21 @@ horizon_fastapi_template = ["static/**"]
 
 [tool.setuptools]
 include-package-data = true
+
+[tool.pytest.ini_options]
+testpaths = ["horizon_fastapi_template/_tests"]
+python_files = ["test_*.py", "*_test.py"]
+
+addopts = "-ra -q --disable-warnings --strict-markers"
+
+markers = [
+    "asyncio: mark test to be run by the asyncio event loop",
+    "rest: mark test as needing a REST server",
+    "graphql: mark test as needing a GraphQL server",
+    "ftp: mark test as needing an ftp server",
+]
+
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)s] %(message)s"
+log_cli_date_format = "%H:%M:%S"

@@ -9,3 +9,6 @@ loguru
 python-dotenv
 prometheus-client
 kubernetes_asyncio
+pytest
+pytest-asyncio
+respx
