@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "horizon-fastapi-template"
-version = "0.0.1.dev1"
+version = "0.0.4.dev1"
 description = """A reusable FastAPI application factory
 The main contributor and maintainer is Chaim Mendelson, with contributions from Yehonatan Magen."""
 readme = "README.md"
@@ -24,7 +24,7 @@ dependencies = [
     "uvicorn>=0.24",
     "pytest>=7.4",
     "pytest-asyncio>=0.22",
-    "respx>=0.24",
+    "respx>=0.18.0",
 ]
 
 [tool.setuptools.packages.find]
