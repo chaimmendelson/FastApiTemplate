@@ -12,10 +12,8 @@ def create_graphql_router(
         static_files_path: Path
 ) -> APIRouter:
 
-    schema = strawberry.Schema(query=version.query)
-
     graphql_app = GraphQLRouter(
-        schema,
+        version.graphql_schema,
         prefix=f"/graphql/{version.version}",
         context_getter=version.context_getter,
         graphiql=False

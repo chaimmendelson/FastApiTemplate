@@ -1,7 +1,7 @@
 # FastAPI Template
 
 A reusable FastAPI application factory packaged for quick reuse. The package exposes a
-single public function, `create_app`, which returns a fully configured FastAPI
+single public function, `general_create_app`, which returns a fully configured FastAPI
 instance with logging, metrics, documentation, and health-check routes ready to go.
 
 ## 🚀 Quick Start
@@ -17,21 +17,46 @@ pip install horizon-fastapi-template
 Create a new file (for example `main.py`) and bootstrap your API:
 
 ```python
-from horizon_fastapi_template import create_app
+from horizon_fastapi_template import general_create_app
+from horizon_fastapi_template.utils import settings
 
-app = create_app()
+app = general_create_app()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=settings.PORT)
 ```
 
-Run the application with Uvicorn:
+Run the application:
 
 ```bash
-uvicorn main:app --reload
+python -m main
 ```
 
 ## 🔧 Configuration
 
 Application behaviour is configured through environment variables using
 [`pydantic-settings`](https://docs.pydantic.dev/latest/usage/pydantic_settings/).
+
+| Variable                    | Description                                         | Example                     | Default                                                                                                             |
+| --------------------------- | --------------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `PORT`                      | The port the application will run on.               | `8000`, `8080`              | `8000`                                                                                                              |
+| `LOG_LEVEL`                 | Logging level for the application.                  | `INFO`, `DEBUG`, `WARNING`  | `INFO`                                                                                                              |
+| `DEBUG`                     | Whether the application should run in debug mode.   | `true` / `false`            | `false`                                                                                                             |
+| `RELOAD_INCLUDES`           | List of files or patterns that trigger auto-reload. | `["*.py"]`                  | `[".env"]`                                                                                                          |
+| `APP_NAME`                  | The name of the application.                        | `UserService`, `PaymentAPI` | `MyApp`                                                                                                             |
+| `PROCESS_TIME_HEADER`       | Response header used to expose processing time.     | `X-Response-Time`           | `X-Process-Time`                                                                                                    |
+| `OPENAPI_VERSION`           | OpenAPI version used for Swagger UI.                | `3.0.2`, `3.1.0`            | `3.0.2`                                                                                                             |
+| `OPENAPI_JSON_URL`          | URL path for the OpenAPI JSON schema.               | `/api/openapi.json`         | `/openapi.json`                                                                                                     |
+| `PROXIED`                   | Whether the API runs behind a reverse proxy.        | `true` / `false`            | `false`                                                                                                             |
+| `PROXY_LISTEN_PATH`         | Path prefix used by the proxy.                      | `/proxy`, `/api/proxy`      | `/`                                                                                                                 |
+| `SWAGGER_STATIC_FILES`      | Path where Swagger UI static files are served.      | `/static/swagger`           | `/static/swagger`                                                                                                   |
+| `SWAGGER_OPENAPI_JSON_URL`  | Path to the OpenAPI JSON used by Swagger.           | `/api/openapi.json`         | `/openapi.json`                                                                                                     |
+| `GRAPHIQL_STATIC_FILES`     | Path to GraphiQL (GraphQL UI) static assets.        | `static/graphiql`           | `static/graphiql`                                                                                                   |
+| `LOG_REQUEST_EXCLUDE_PATHS` | Paths excluded from request logging.                | `["/health", "/metrics"]`   | `["/health", "/metrics", "/static", "/docs", "/redoc", "/openapi.json", "/.well-known", "/graphql/v.*/playground"]` |
+| `PROBE_READINESS_PATH`      | Readiness probe endpoint.                           | `/api/readiness`            | `/readiness`                                                                                                        |
+| `PROBE_LIVENESS_PATH`       | Liveness probe endpoint.                            | `/api/liveness`             | `/liveness`                                                                                                         |
+
 Create a `.env` file alongside your application if you need to override defaults:
 
 ```env
@@ -83,7 +108,7 @@ FastApiTemplate/
 Install dependencies in editable mode when working on the package:
 
 ```bash
-pip install -e .
+pip install -e .[dev]
 ```
 
 Run the example application from the repository root:
